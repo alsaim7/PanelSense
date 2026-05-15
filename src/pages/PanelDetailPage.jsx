@@ -2,12 +2,18 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, Chip, IconButton, Skeleton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import ShareIcon from '@mui/icons-material/Share';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 import { motion } from 'framer-motion';
 import { fetchPanelById } from '../api/api';
 import { Footer } from '../components/Footer';
 import { Navbar } from '../components/Navbar';
 import { PanelPlaceholder } from '../components/PanelPlaceholder';
+import { isPanelLiked, toggleLikedPanel } from '../utils/likedPanels';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 22 },
@@ -45,13 +51,18 @@ function PanelDetailPage() {
   const [imageFailed, setImageFailed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [liked, setLiked] = useState(false);
+  const [likeBurst, setLikeBurst] = useState(false);
+  const [shareStatus, setShareStatus] = useState('');
 
   const loadPanel = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
       const { data } = await fetchPanelById(id);
-      setPanel(data?.panel || data?.data || data);
+      const nextPanel = data?.panel || data?.data || data;
+      setPanel(nextPanel);
+      setLiked(isPanelLiked(nextPanel?.id));
     } catch (requestError) {
       setError(requestError.response?.data?.detail || 'Could not load this panel.');
     } finally {
@@ -63,6 +74,39 @@ function PanelDetailPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadPanel();
   }, [loadPanel]);
+
+  const handleLike = () => {
+    const result = toggleLikedPanel(panel);
+    setLiked(result.liked);
+    if (result.liked) {
+      setLikeBurst(true);
+      window.setTimeout(() => setLikeBurst(false), 650);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = panel?.name ? `${panel.name} | PanelCraft` : 'PanelCraft wall panel';
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text: 'Take a look at this wall panel.', url });
+        setShareStatus('Shared');
+      } else {
+        await navigator.clipboard.writeText(url);
+        setShareStatus('Link copied');
+      }
+    } catch {
+      setShareStatus('');
+      return;
+    }
+
+    window.setTimeout(() => setShareStatus(''), 2200);
+  };
+
+  const openAssistant = () => {
+    window.dispatchEvent(new CustomEvent('panelcraft:open-ai'));
+  };
 
   const tags = Array.isArray(panel?.tags)
     ? panel.tags
@@ -122,7 +166,41 @@ function PanelDetailPage() {
             </div>
 
             <div className="glass-panel rounded-lg p-6 md:p-8">
-              <h1 className="font-syne text-4xl font-extrabold leading-tight md:text-5xl">{panel?.name || 'Untitled Panel'}</h1>
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                <h1 className="font-syne text-4xl font-extrabold leading-tight md:text-5xl">{panel?.name || 'Untitled Panel'}</h1>
+                <div className="flex shrink-0 items-center gap-2">
+                  <IconButton
+                    aria-label={liked ? 'Remove from liked panels' : 'Add to liked panels'}
+                    onClick={handleLike}
+                    className={likeBurst ? 'liked-burst' : ''}
+                    sx={{
+                      color: liked ? 'var(--accent)' : 'white',
+                      border: '1px solid var(--border)',
+                      bgcolor: liked ? 'rgba(233,69,96,0.15)' : 'rgba(15,52,96,0.32)',
+                    }}
+                  >
+                    {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                  </IconButton>
+                  <IconButton
+                    aria-label="Share this panel"
+                    onClick={handleShare}
+                    sx={{ color: 'white', border: '1px solid var(--border)', bgcolor: 'rgba(15,52,96,0.32)' }}
+                  >
+                    {shareStatus === 'Link copied' ? <ContentCopyIcon /> : <ShareIcon />}
+                  </IconButton>
+                </div>
+              </div>
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <Button
+                  variant="contained"
+                  startIcon={<SmartToyIcon />}
+                  onClick={openAssistant}
+                  sx={{ bgcolor: 'var(--accent)', '&:hover': { bgcolor: 'var(--accent-hover)' } }}
+                >
+                  Ask AI About This Panel
+                </Button>
+                {shareStatus && <span className="text-sm font-bold text-[var(--accent)]">{shareStatus}</span>}
+              </div>
               <div className="mt-8 grid gap-6 sm:grid-cols-2">
                 <Field label="Category" value={panel?.category} />
                 <Field label="Color" value={panel?.color} />
@@ -146,6 +224,9 @@ function PanelDetailPage() {
                   ))}
                 </div>
               )}
+              <p className="mt-8 rounded-lg border border-[var(--border)] bg-[rgba(233,69,96,0.08)] p-4 text-sm leading-6 text-[var(--text-secondary)]">
+                Likes are saved in your browser local storage only. They are not synced to an account and may be removed if browser data is cleared.
+              </p>
             </div>
           </motion.section>
         )}

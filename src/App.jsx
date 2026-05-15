@@ -2,9 +2,11 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CircularProgress, ThemeProvider, createTheme } from '@mui/material';
+import { ChatBotProvider } from './components/ChatBotProvider';
 import HomePage from './pages/HomePage';
 
 const PanelDetailPage = lazy(() => import('./pages/PanelDetailPage'));
+const LikedPanelsPage = lazy(() => import('./pages/LikedPanelsPage'));
 const RecommendationPage = lazy(() => import('./pages/RecommendationPage'));
 
 const theme = createTheme({
@@ -58,6 +60,7 @@ function AnimatedRoutes() {
           <Routes location={location}>
             <Route path="/" element={<HomePage />} />
             <Route path="/panel/:id" element={<PanelDetailPage />} />
+            <Route path="/liked" element={<LikedPanelsPage />} />
             <Route path="/recommendations" element={<RecommendationPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
@@ -72,6 +75,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         <AnimatedRoutes />
+        <ChatBotProvider />
       </BrowserRouter>
     </ThemeProvider>
   );

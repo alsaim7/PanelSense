@@ -30,6 +30,18 @@ function useRecommendations() {
   }, [location.state]);
 }
 
+function useRecommendationMeta() {
+  const location = useLocation();
+  return useMemo(() => {
+    if (location.state?.recommendationMeta) return location.state.recommendationMeta;
+    try {
+      return JSON.parse(localStorage.getItem('panelcraft_recommendation_meta') || 'null');
+    } catch {
+      return null;
+    }
+  }, [location.state]);
+}
+
 function RecommendationCard({ recommendation }) {
   const [imageFailed, setImageFailed] = useState(false);
   const navigate = useNavigate();
@@ -88,6 +100,10 @@ function EmptyRecommendations() {
 function RecommendationPage() {
   const navigate = useNavigate();
   const recommendations = useRecommendations();
+  const recommendationMeta = useRecommendationMeta();
+  const missingFields = Array.isArray(recommendationMeta?.missing_fields)
+    ? recommendationMeta.missing_fields
+    : [];
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)]">
@@ -106,6 +122,22 @@ function RecommendationPage() {
           <p className="mt-8 max-w-2xl leading-8 text-[var(--text-secondary)]">
             These selections are based on your room type, wall color, lighting, and style preferences.
           </p>
+          {recommendationMeta?.status === 'partial_data' && (
+            <div className="mt-6 max-w-3xl rounded-lg border border-[var(--border)] bg-[rgba(233,69,96,0.08)] p-5">
+              <h2 className="font-syne text-xl font-bold">Recommended with partial details</h2>
+              {recommendationMeta.message && (
+                <p className="mt-2 leading-7 text-[var(--text-secondary)]">{recommendationMeta.message}</p>
+              )}
+              {missingFields.length > 0 && (
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                  Missing or unclear: {missingFields.join(', ')}
+                </p>
+              )}
+              {recommendationMeta.suggestion && (
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">{recommendationMeta.suggestion}</p>
+              )}
+            </div>
+          )}
         </section>
 
         {recommendations.length ? (

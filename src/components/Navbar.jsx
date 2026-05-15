@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Box, Drawer, IconButton, List, ListItemButton, ListItemText } from '@mui/material';
+import { Box, Button, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 import { BrandLogo } from './BrandLogo';
 
 export function Navbar() {
@@ -24,6 +26,16 @@ export function Navbar() {
     document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const openAssistant = () => {
+    setOpen(false);
+    window.dispatchEvent(new CustomEvent('panelcraft:open-ai'));
+  };
+
+  const navLinkClass = ({ isActive }) =>
+    `relative py-2 text-sm font-bold text-[var(--text-primary)] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-[var(--accent)] after:transition-all ${
+      isActive ? 'after:w-full' : 'after:w-0 hover:after:w-full'
+    }`;
+
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-[var(--border)] bg-[rgba(10,10,26,0.94)]">
       <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
@@ -32,15 +44,11 @@ export function Navbar() {
         </button>
 
         <div className="hidden items-center gap-8 md:flex">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `relative py-2 text-sm font-bold text-[var(--text-primary)] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-[var(--accent)] after:transition-all ${
-                isActive ? 'after:w-full' : 'after:w-0 hover:after:w-full'
-              }`
-            }
-          >
+          <NavLink to="/" className={navLinkClass}>
             Home
+          </NavLink>
+          <NavLink to="/liked" className={navLinkClass}>
+            Liked Panels
           </NavLink>
           <button
             type="button"
@@ -49,6 +57,19 @@ export function Navbar() {
           >
             Contact
           </button>
+          <Button
+            variant="contained"
+            startIcon={<SmartToyIcon />}
+            onClick={openAssistant}
+            sx={{
+              bgcolor: 'var(--accent)',
+              borderRadius: 2,
+              boxShadow: '0 12px 30px rgba(233,69,96,0.22)',
+              '&:hover': { bgcolor: 'var(--accent-hover)' },
+            }}
+          >
+            Ask AI
+          </Button>
         </div>
 
         <IconButton className="md:!hidden" aria-label="Open navigation" onClick={() => setOpen(true)} sx={{ color: 'white' }}>
@@ -80,6 +101,23 @@ export function Navbar() {
         <List>
           <ListItemButton onClick={goHome}>
             <ListItemText primary="Home" />
+          </ListItemButton>
+          <ListItemButton
+            onClick={() => {
+              setOpen(false);
+              navigate('/liked');
+            }}
+          >
+            <ListItemIcon sx={{ color: 'var(--accent)', minWidth: 36 }}>
+              <FavoriteIcon />
+            </ListItemIcon>
+            <ListItemText primary="Liked Panels" />
+          </ListItemButton>
+          <ListItemButton onClick={openAssistant}>
+            <ListItemIcon sx={{ color: 'var(--accent)', minWidth: 36 }}>
+              <SmartToyIcon />
+            </ListItemIcon>
+            <ListItemText primary="Ask AI" />
           </ListItemButton>
           <ListItemButton onClick={goContact}>
             <ListItemText primary="Contact" />

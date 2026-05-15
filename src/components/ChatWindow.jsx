@@ -16,34 +16,62 @@ const initialState = {
   style: '',
   isLoading: false,
   isComplete: false,
+  hasError: false,
   recommendations: [],
+  recommendationMeta: null,
 };
 
 function normalizeChatResponse(data) {
   const response = data?.response;
   const isRecommendationResponse = Array.isArray(response);
-  
-  // If it's a recommendation response, we can still include a dynamic AI message
-  // or use the first recommendation's reason as the AI text
-  let aiText = '';
-  
+  const missingFields = Array.isArray(data?.missing_fields) ? data.missing_fields : [];
+  const suggestion = data?.suggestion || '';
+  const status =
+    isRecommendationResponse && missingFields.length
+      ? 'partial_data'
+      : isRecommendationResponse
+        ? 'success'
+        : suggestion || missingFields.length
+          ? 'no_data'
+          : 'in_progress';
+
+  let aiText;
+
   if (isRecommendationResponse) {
     if (response.length) {
-      // You could either use a generic message or combine the reasons
-      aiText = `I found ${response.length} recommended panel${response.length > 1 ? 's' : ''} for your space!`;
-      // Alternative: Use the first recommendation's reason
-      // aiText = response[0].reason;
+      const intro =
+        data?.ai_message ||
+        data?.message ||
+        `I found ${response.length} recommended panel${response.length > 1 ? 's' : ''} for your space!`;
+      const missingText = missingFields.length
+        ? ` Missing or unclear: ${missingFields.join(', ')}.`
+        : '';
+      const suggestionText = suggestion ? ` ${suggestion}` : '';
+      aiText = `${intro}${missingText}${suggestionText}`;
     } else {
       aiText = 'No recommendations matched your answers yet. Try starting again with broader preferences.';
     }
   } else {
-    aiText = String(response || 'Tell me a little more.');
+    const text = data?.ai_message || data?.message || response || 'Tell me a little more.';
+    const missingText = missingFields.length
+      ? ` Missing or unclear: ${missingFields.join(', ')}.`
+      : '';
+    const suggestionText = suggestion ? ` ${suggestion}` : '';
+    aiText = `${text}${missingText}${suggestionText}`;
   }
-  
+
   return {
-    isComplete: isRecommendationResponse,
+    isComplete: isRecommendationResponse || status === 'no_data',
     recommendations: isRecommendationResponse ? response : [],
-    aiText: aiText,
+    recommendationMeta: status === 'in_progress'
+      ? null
+      : {
+          status,
+          message: data?.ai_message || data?.message || (typeof response === 'string' ? response : ''),
+          suggestion,
+          missing_fields: missingFields,
+        },
+    aiText,
   };
 }
 
@@ -132,13 +160,14 @@ export function ChatWindow({ open, onClose, onError }) {
 
         console.log('API Response:', data);
 
-        const { aiText, isComplete, recommendations } =
+        const { aiText, isComplete, recommendations, recommendationMeta } =
           normalizeChatResponse(data);
 
         console.log('Normalized Response:', {
           aiText,
           isComplete,
           recommendations,
+          recommendationMeta,
         });
 
         setState((current) => {
@@ -163,7 +192,9 @@ export function ChatWindow({ open, onClose, onError }) {
               current.style,
             isLoading: false,
             isComplete,
+            hasError: false,
             recommendations,
+            recommendationMeta,
             messages: [
               ...current.messages,
               {
@@ -197,6 +228,17 @@ export function ChatWindow({ open, onClose, onError }) {
         setState((current) => ({
           ...current,
           isLoading: false,
+          isComplete: false,
+          hasError: true,
+          recommendations: [],
+          recommendationMeta: null,
+          messages: [
+            ...current.messages,
+            {
+              role: 'ai',
+              text: 'I could not connect to the assistant right now. Please start again and try once more.',
+            },
+          ],
         }));
 
         onError?.(
@@ -235,8 +277,14 @@ export function ChatWindow({ open, onClose, onError }) {
 
   const viewRecommendations = () => {
     localStorage.setItem('panelcraft_recommendations', JSON.stringify(state.recommendations));
+    localStorage.setItem('panelcraft_recommendation_meta', JSON.stringify(state.recommendationMeta));
     onClose();
-    navigate('/recommendations', { state: { recommendations: state.recommendations } });
+    navigate('/recommendations', {
+      state: {
+        recommendations: state.recommendations,
+        recommendationMeta: state.recommendationMeta,
+      },
+    });
   };
 
   const handleSubmit = (event) => {
@@ -283,7 +331,17 @@ export function ChatWindow({ open, onClose, onError }) {
         </div>
       </DialogContent>
       <DialogActions className="!block border-t border-[var(--border)] !p-4">
-        {state.isComplete ? (
+        {state.hasError ? (
+          <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<RestartAltIcon />}
+            onClick={restart}
+            sx={{ borderColor: 'var(--border)', color: 'white' }}
+          >
+            Start Again
+          </Button>
+        ) : state.isComplete ? (
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button
               fullWidth

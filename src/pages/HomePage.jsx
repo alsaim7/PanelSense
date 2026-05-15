@@ -3,7 +3,6 @@ import { Alert, Button } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { motion } from 'framer-motion';
 import { fetchPanels } from '../api/api';
-import { ChatBot } from '../components/ChatBot';
 import { FilterBar } from '../components/FilterBar';
 import { Footer } from '../components/Footer';
 import { Navbar } from '../components/Navbar';
@@ -11,8 +10,6 @@ import { Pagination } from '../components/Pagination';
 import { PanelCard } from '../components/PanelCard';
 import { PanelCardSkeleton } from '../components/PanelCardSkeleton';
 import { SearchBar } from '../components/SearchBar';
-import { Toast } from '../components/Toast';
-import { useToast } from '../hooks/useToast';
 
 const LIMIT = 12;
 
@@ -50,7 +47,6 @@ function HomePage() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { toasts, showToast, removeToast } = useToast();
 
   const loadPanels = useCallback(async () => {
     setLoading(true);
@@ -67,11 +63,10 @@ function HomePage() {
     } catch (requestError) {
       const message = requestError.response?.data?.detail || 'Could not load panels. Check your backend connection.';
       setError(message);
-      showToast(message, 'error');
     } finally {
       setLoading(false);
     }
-  }, [category, color, page, search, showToast, style]);
+  }, [category, color, page, search, style]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -203,8 +198,6 @@ function HomePage() {
         </div>
       </main>
       <Footer />
-      <ChatBot onError={(message) => showToast(message, 'error')} />
-      <Toast toasts={toasts} onClose={removeToast} />
     </div>
   );
 }
