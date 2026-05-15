@@ -6,7 +6,7 @@ import { ChatBotProvider } from './components/ChatBotProvider';
 import HomePage from './pages/HomePage';
 
 const PanelDetailPage = lazy(() => import('./pages/PanelDetailPage'));
-const LikedPanelsPage = lazy(() => import('./pages/LikedPanelsPage'));
+const LikedPanelsPage = lazy(() => import('./pages/LikedPanelsPage'))
 const RecommendationPage = lazy(() => import('./pages/RecommendationPage'));
 
 const theme = createTheme({
