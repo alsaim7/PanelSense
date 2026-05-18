@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 import { Footer } from '../components/Footer';
 import { Navbar } from '../components/Navbar';
 import { PanelPlaceholder } from '../components/PanelPlaceholder';
+import { SEO } from '../components/SEO';
+import { getCanonicalUrl, panelImageAlt } from '../utils/seo';
 
 const gridVariants = {
   animate: { transition: { staggerChildren: 0.09 } },
@@ -22,7 +24,7 @@ function useRecommendations() {
   return useMemo(() => {
     if (Array.isArray(location.state?.recommendations)) return location.state.recommendations;
     try {
-      const stored = JSON.parse(localStorage.getItem('panelcraft_recommendations') || '[]');
+      const stored = JSON.parse(localStorage.getItem('panelsense_recommendations') || '[]');
       return Array.isArray(stored) ? stored : [];
     } catch {
       return [];
@@ -35,7 +37,7 @@ function useRecommendationMeta() {
   return useMemo(() => {
     if (location.state?.recommendationMeta) return location.state.recommendationMeta;
     try {
-      return JSON.parse(localStorage.getItem('panelcraft_recommendation_meta') || 'null');
+      return JSON.parse(localStorage.getItem('panelsense_recommendation_meta') || 'null');
     } catch {
       return null;
     }
@@ -57,8 +59,10 @@ function RecommendationCard({ recommendation }) {
         {recommendation.image_url && !imageFailed ? (
           <img
             src={recommendation.image_url}
-            alt={recommendation.name || 'Recommended panel'}
+            alt={panelImageAlt(recommendation, `${recommendation.name || 'Recommended'} wall panel design`)}
             onError={() => setImageFailed(true)}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         ) : (
@@ -107,6 +111,20 @@ function RecommendationPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)]">
+      <SEO
+        title="Personalized Wall Panel Suggestions"
+        description="View personalized decorative wall panel suggestions selected from your room type, wall color, lighting, material, texture, and style preferences."
+        canonicalPath="/recommendations"
+        noindex
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Wall panel designs', item: getCanonicalUrl('/') },
+            { '@type': 'ListItem', position: 2, name: 'Panel suggestions', item: getCanonicalUrl('/recommendations') },
+          ],
+        }}
+      />
       <Navbar />
       <main className="mx-auto max-w-7xl px-5 pb-16 pt-32 md:px-8">
         <IconButton
@@ -117,10 +135,13 @@ function RecommendationPage() {
           <ArrowBackIcon />
         </IconButton>
 
-        <section className="mb-12">
-          <h1 className="font-syne accent-underline text-4xl font-extrabold leading-tight md:text-6xl">AI Recommended Panels for You</h1>
+        <section className="mb-12" aria-labelledby="recommendations-heading">
+          <h1 id="recommendations-heading" className="font-syne accent-underline text-4xl font-extrabold leading-tight md:text-6xl">
+            Recommended Panels for You
+          </h1>
           <p className="mt-8 max-w-2xl leading-8 text-[var(--text-secondary)]">
-            These selections are based on your room type, wall color, lighting, and style preferences.
+            These decorative wall panel selections are based on your room type, wall color, lighting, texture, material,
+            and style preferences, with PanelSense AI supporting the shortlist.
           </p>
           {recommendationMeta?.status === 'partial_data' && (
             <div className="mt-6 max-w-3xl rounded-lg border border-[var(--border)] bg-[rgba(233,69,96,0.08)] p-5">

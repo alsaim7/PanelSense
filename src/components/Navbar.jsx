@@ -28,7 +28,7 @@ export function Navbar() {
 
   const openAssistant = () => {
     setOpen(false);
-    window.dispatchEvent(new CustomEvent('panelcraft:open-ai'));
+    window.dispatchEvent(new CustomEvent('panelsense:open-assistant'));
   };
 
   const navLinkClass = ({ isActive }) =>
@@ -38,7 +38,7 @@ export function Navbar() {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-[var(--border)] bg-[rgba(10,10,26,0.94)]">
-      <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8">
+      <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 md:px-8" aria-label="Primary navigation">
         <button type="button" onClick={goHome} className="flex items-center text-left" aria-label="Go to home">
           <BrandLogo />
         </button>

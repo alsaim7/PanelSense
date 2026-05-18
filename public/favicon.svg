@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
   <defs>
-    <linearGradient id="panelcraftGradient" x1="8" x2="40" y1="8" y2="40" gradientUnits="userSpaceOnUse">
+    <linearGradient id="panelsenseGradient" x1="8" x2="40" y1="8" y2="40" gradientUnits="userSpaceOnUse">
       <stop stop-color="#e94560"/>
       <stop offset="1" stop-color="#ff7a8d"/>
     </linearGradient>
@@ -8,7 +8,7 @@
       <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#e94560" flood-opacity=".35"/>
     </filter>
   </defs>
-  <rect width="48" height="48" rx="12" fill="url(#panelcraftGradient)" filter="url(#shadow)"/>
+  <rect width="48" height="48" rx="12" fill="url(#panelsenseGradient)" filter="url(#shadow)"/>
   <rect x="12" y="12" width="10" height="10" rx="2" fill="#fff" fill-opacity=".92"/>
   <rect x="26" y="12" width="10" height="10" rx="2" fill="#fff" fill-opacity=".92"/>
   <rect x="12" y="26" width="10" height="10" rx="2" fill="#fff" fill-opacity=".92"/>

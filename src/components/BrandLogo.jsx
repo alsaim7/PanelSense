@@ -5,7 +5,7 @@ export function BrandLogo({ size = 38, showText = true }) {
   const gap = size * 0.08;
 
   return (
-    <Box className="flex items-center gap-3" aria-label="PanelCraft">
+    <Box className="flex items-center gap-3" aria-label="PanelSense">
       <Box
         component="span"
         sx={{
@@ -35,7 +35,7 @@ export function BrandLogo({ size = 38, showText = true }) {
           />
         ))}
       </Box>
-      {showText && <span className="font-syne text-xl font-extrabold tracking-normal">PanelCraft</span>}
+      {showText && <span className="font-syne text-xl font-extrabold tracking-normal">PanelSense</span>}
     </Box>
   );
 }

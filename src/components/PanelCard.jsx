@@ -1,16 +1,18 @@
 import { memo, useState } from 'react';
 import { Button, Card, CardContent, CardMedia } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { PanelPlaceholder } from './PanelPlaceholder';
+import { panelImageAlt } from '../utils/seo';
 
 function PanelCardComponent({ panel }) {
   const [imageFailed, setImageFailed] = useState(false);
-  const navigate = useNavigate();
+  const panelPath = panel?.id ? `/panel/${panel.id}` : '/';
 
   return (
     <div className="panel-card-shell">
       <Card
+        component="article"
         className="h-full overflow-hidden"
         sx={{
           bgcolor: 'rgba(15,52,96,0.34)',
@@ -28,9 +30,10 @@ function PanelCardComponent({ panel }) {
             <CardMedia
               component="img"
               image={panel.image_url}
-              alt={panel.name || 'Wall panel'}
+              alt={panelImageAlt(panel)}
               onError={() => setImageFailed(true)}
               loading="lazy"
+              decoding="async"
               sx={{ height: '100%', width: '100%', objectFit: 'cover' }}
             />
           ) : (
@@ -41,10 +44,11 @@ function PanelCardComponent({ panel }) {
           <h3 className="font-syne line-clamp-2 text-xl font-bold text-white">{panel?.name || 'Untitled Panel'}</h3>
           <Button
             fullWidth
+            component={Link}
+            to={panelPath}
             variant="outlined"
             endIcon={<ArrowForwardIcon />}
             aria-label={`View details for ${panel?.name || 'panel'}`}
-            onClick={() => navigate(`/panel/${panel?.id}`)}
             disabled={!panel?.id}
             sx={{
               borderColor: 'var(--accent)',

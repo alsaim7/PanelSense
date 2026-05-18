@@ -243,7 +243,7 @@ export function ChatWindow({ open, onClose, onError }) {
 
         onError?.(
           error.response?.data?.detail ||
-          'AI assistant is unavailable. Please try again.'
+          'PanelSense AI assistant is unavailable. Please try again.'
         );
       }
     },
@@ -276,8 +276,8 @@ export function ChatWindow({ open, onClose, onError }) {
   };
 
   const viewRecommendations = () => {
-    localStorage.setItem('panelcraft_recommendations', JSON.stringify(state.recommendations));
-    localStorage.setItem('panelcraft_recommendation_meta', JSON.stringify(state.recommendationMeta));
+    localStorage.setItem('panelsense_recommendations', JSON.stringify(state.recommendations));
+    localStorage.setItem('panelsense_recommendation_meta', JSON.stringify(state.recommendationMeta));
     onClose();
     navigate('/recommendations', {
       state: {
@@ -298,9 +298,9 @@ export function ChatWindow({ open, onClose, onError }) {
     <>
       <DialogTitle className="flex items-center justify-between border-b border-[var(--border)]">
         <span className="font-syne flex items-center gap-2 text-xl font-bold">
-          <SmartToyIcon sx={{ color: 'var(--accent)' }} /> PanelCraft AI
+          <SmartToyIcon sx={{ color: 'var(--accent)' }} /> PanelSense AI
         </span>
-        <IconButton aria-label="Close AI assistant" onClick={onClose} sx={{ color: 'white' }}>
+        <IconButton aria-label="Close PanelSense AI assistant" onClick={onClose} sx={{ color: 'white' }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>

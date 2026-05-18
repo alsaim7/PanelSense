@@ -1,5 +1,6 @@
 import { Button } from '@mui/material';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
+import { Link } from 'react-router-dom';
 import { BrandLogo } from './BrandLogo';
 
 export function Footer() {
@@ -9,17 +10,21 @@ export function Footer() {
         <div>
           <BrandLogo />
           <p className="mt-4 max-w-sm text-sm leading-6 text-[var(--text-secondary)]">
-            Luxury wall panel discovery shaped for modern interiors, design studios, and thoughtful renovators.
+            Decorative wall panel discovery, panel images, and modern interior panel ideas for design studios, homeowners,
+            and thoughtful renovators.
           </p>
         </div>
-        <div>
-          <h3 className="font-syne mb-4 text-lg font-bold">Quick Links</h3>
-          <a className="text-sm text-[var(--text-secondary)] transition hover:text-white" href="/">
+        <nav aria-label="Footer navigation">
+          <h2 className="font-syne mb-4 text-lg font-bold">Quick Links</h2>
+          <Link className="block text-sm text-[var(--text-secondary)] transition hover:text-white" to="/">
             Home
-          </a>
-        </div>
+          </Link>
+          <Link className="mt-3 block text-sm text-[var(--text-secondary)] transition hover:text-white" to="/liked">
+            Liked Panels
+          </Link>
+        </nav>
         <div>
-          <h3 className="font-syne mb-4 text-lg font-bold">Contact</h3>
+          <h2 className="font-syne mb-4 text-lg font-bold">Contact</h2>
           <p className="text-sm leading-6 text-[var(--text-secondary)]">
             Built by{' '}
             <a className="font-bold text-white underline decoration-[var(--accent)]" href="https://alsaim.pages.dev/" target="_blank" rel="noreferrer">
@@ -39,7 +44,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-[var(--border)] px-5 py-5 text-center text-sm text-[var(--text-secondary)]">
-        © {new Date().getFullYear()} PanelCraft. All rights reserved.
+        &copy; {new Date().getFullYear()} PanelSense. All rights reserved.
       </div>
     </footer>
   );

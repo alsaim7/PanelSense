@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /liked
+Disallow: /recommendations
+
+Sitemap: https://panelsense.vercel.app/sitemap.xml

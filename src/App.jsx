@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CircularProgress, ThemeProvider, createTheme } from '@mui/material';
+import { HelmetProvider } from 'react-helmet-async';
 import { ChatBotProvider } from './components/ChatBotProvider';
 import HomePage from './pages/HomePage';
 
@@ -72,12 +73,14 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <AnimatedRoutes />
-        <ChatBotProvider />
-      </BrowserRouter>
-    </ThemeProvider>
+    <HelmetProvider>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <AnimatedRoutes />
+          <ChatBotProvider />
+        </BrowserRouter>
+      </ThemeProvider>
+    </HelmetProvider>
   );
 }
 

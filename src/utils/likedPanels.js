@@ -1,4 +1,4 @@
-export const LIKED_PANELS_KEY = 'panelcraft_liked_panels';
+export const LIKED_PANELS_KEY = 'panelsense_liked_panels';
 
 export function getLikedPanels() {
   try {
@@ -37,6 +37,6 @@ export function toggleLikedPanel(panel) {
       ];
 
   localStorage.setItem(LIKED_PANELS_KEY, JSON.stringify(panels));
-  window.dispatchEvent(new CustomEvent('panelcraft:liked-panels-updated'));
+  window.dispatchEvent(new CustomEvent('panelsense:liked-panels-updated'));
   return { liked: !exists, panels };
 }

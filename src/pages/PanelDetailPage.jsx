@@ -13,6 +13,8 @@ import { fetchPanelById } from '../api/api';
 import { Footer } from '../components/Footer';
 import { Navbar } from '../components/Navbar';
 import { PanelPlaceholder } from '../components/PanelPlaceholder';
+import { SEO } from '../components/SEO';
+import { getCanonicalUrl, panelImageAlt, truncateDescription } from '../utils/seo';
 import { isPanelLiked, toggleLikedPanel } from '../utils/likedPanels';
 
 const fadeInUp = {
@@ -86,7 +88,7 @@ function PanelDetailPage() {
 
   const handleShare = async () => {
     const url = window.location.href;
-    const title = panel?.name ? `${panel.name} | PanelCraft` : 'PanelCraft wall panel';
+    const title = panel?.name ? `${panel.name} | PanelSense` : 'PanelSense wall panel';
 
     try {
       if (navigator.share) {
@@ -105,7 +107,7 @@ function PanelDetailPage() {
   };
 
   const openAssistant = () => {
-    window.dispatchEvent(new CustomEvent('panelcraft:open-ai'));
+    window.dispatchEvent(new CustomEvent('panelsense:open-assistant'));
   };
 
   const tags = Array.isArray(panel?.tags)
@@ -114,8 +116,59 @@ function PanelDetailPage() {
       ? panel.tags.split(',').map((tag) => tag.trim()).filter(Boolean)
       : [];
 
+  const panelTitle = panel?.name || 'Decorative Wall Panel';
+  const panelDescription = truncateDescription(
+    panel?.description,
+    `${panelTitle} decorative wall panel design for modern interiors. Compare color, style, category, panel images, and ask PanelSense AI for personalized panel suggestions.`,
+  );
+  const detailStructuredData = panel
+    ? [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: panelTitle,
+          description: panelDescription,
+          image: panel.image_url || getCanonicalUrl('/favicon.svg'),
+          category: panel.category || 'Decorative wall panels',
+          color: panel.color,
+          material: panel.material || panel.texture || panel.category,
+          brand: {
+            '@type': 'Brand',
+            name: 'PanelSense',
+          },
+          url: getCanonicalUrl(`/panel/${id}`),
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Wall panel designs',
+              item: getCanonicalUrl('/'),
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: panelTitle,
+              item: getCanonicalUrl(`/panel/${id}`),
+            },
+          ],
+        },
+      ]
+    : [];
+
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)]">
+      <SEO
+        title={panel ? `${panelTitle} Decorative Wall Panel Design` : 'Wall Panel Design Details'}
+        description={panelDescription}
+        image={panel?.image_url}
+        type="product"
+        canonicalPath={`/panel/${id}`}
+        structuredData={detailStructuredData}
+      />
       <Navbar />
       <main className="mx-auto max-w-7xl px-5 pb-16 pt-32 md:px-8">
         <IconButton
@@ -145,6 +198,7 @@ function PanelDetailPage() {
         ) : (
           <motion.section
             className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr]"
+            aria-labelledby="panel-detail-heading"
             variants={fadeInUp}
             initial="initial"
             animate="animate"
@@ -155,8 +209,10 @@ function PanelDetailPage() {
                 {panel?.image_url && !imageFailed ? (
                   <img
                     src={panel.image_url}
-                    alt={panel.name || 'Wall panel detail'}
+                    alt={panelImageAlt(panel, `${panelTitle} wall panel detail`)}
                     onError={() => setImageFailed(true)}
+                    fetchPriority="high"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -167,7 +223,9 @@ function PanelDetailPage() {
 
             <div className="glass-panel rounded-lg p-6 md:p-8">
               <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <h1 className="font-syne text-4xl font-extrabold leading-tight md:text-5xl">{panel?.name || 'Untitled Panel'}</h1>
+                <h1 id="panel-detail-heading" className="font-syne text-4xl font-extrabold leading-tight md:text-5xl">
+                  {panelTitle}
+                </h1>
                 <div className="flex shrink-0 items-center gap-2">
                   <IconButton
                     aria-label={liked ? 'Remove from liked panels' : 'Add to liked panels'}
@@ -197,7 +255,7 @@ function PanelDetailPage() {
                   onClick={openAssistant}
                   sx={{ bgcolor: 'var(--accent)', '&:hover': { bgcolor: 'var(--accent-hover)' } }}
                 >
-                  Ask AI About This Panel
+                  Ask PanelSense AI
                 </Button>
                 {shareStatus && <span className="text-sm font-bold text-[var(--accent)]">{shareStatus}</span>}
               </div>
@@ -208,7 +266,7 @@ function PanelDetailPage() {
               </div>
               {panel?.description && (
                 <div className="mt-8">
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">Description</p>
+                  <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">Description</h2>
                   <p className="mt-3 leading-8 text-[var(--text-secondary)]">{panel.description}</p>
                 </div>
               )}
@@ -225,7 +283,8 @@ function PanelDetailPage() {
                 </div>
               )}
               <p className="mt-8 rounded-lg border border-[var(--border)] bg-[rgba(233,69,96,0.08)] p-4 text-sm leading-6 text-[var(--text-secondary)]">
-                Likes are saved in your browser local storage only. They are not synced to an account and may be removed if browser data is cleared.
+                Ask PanelSense AI about this decorative wall panel for matching colors, related interior panel designs, and
+                alternate wall panels from the catalog.
               </p>
             </div>
           </motion.section>

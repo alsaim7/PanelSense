@@ -63,7 +63,7 @@ export function ChatBot({ openSignal, onError }) {
             </button>
           )}
           <Fab
-            aria-label="Open AI panel assistant"
+            aria-label="Open PanelSense AI assistant"
             onClick={openAssistant}
             sx={{
               position: 'relative',

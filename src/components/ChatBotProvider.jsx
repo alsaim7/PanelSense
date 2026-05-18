@@ -9,8 +9,8 @@ export function ChatBotProvider() {
 
   useEffect(() => {
     const openAssistant = () => setOpenSignal((value) => value + 1);
-    window.addEventListener('panelcraft:open-ai', openAssistant);
-    return () => window.removeEventListener('panelcraft:open-ai', openAssistant);
+    window.addEventListener('panelsense:open-assistant', openAssistant);
+    return () => window.removeEventListener('panelsense:open-assistant', openAssistant);
   }, []);
 
   return (
