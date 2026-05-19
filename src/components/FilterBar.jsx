@@ -56,11 +56,15 @@ const defaults = {
 function FilterSelect({ label, value, options, onChange }) {
   return (
     <FormControl fullWidth size="small">
-      <InputLabel sx={{ color: 'var(--text-secondary)' }}>{label}</InputLabel>
+      {/* Remove <InputLabel> entirely */}
       <Select
         value={value}
-        label={label}
         onChange={(event) => onChange(event.target.value)}
+        displayEmpty
+        renderValue={(selected) => {
+          if (selected === '') return `All ${label}`; // e.g. "All Categories"
+          return selected;
+        }}
         sx={{
           color: 'var(--text-primary)',
           bgcolor: 'rgba(15,52,96,0.36)',
@@ -71,7 +75,7 @@ function FilterSelect({ label, value, options, onChange }) {
         }}
         MenuProps={{ slotProps: { paper: { sx: { bgcolor: 'var(--primary)', color: 'var(--text-primary)' } } } }}
       >
-        <MenuItem value="">All</MenuItem>
+        <MenuItem value="">All {label}</MenuItem>
         {options.map((option) => (
           <MenuItem key={option} value={option}>
             {option}
@@ -89,9 +93,9 @@ export function FilterBar({ category, color, style, options = {}, onCategoryChan
 
   return (
     <div className="glass-panel grid gap-4 rounded-lg p-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
-      <FilterSelect label="Category" value={category} options={categories} onChange={onCategoryChange} />
-      <FilterSelect label="Color" value={color} options={colors} onChange={onColorChange} />
-      <FilterSelect label="Style" value={style} options={styles} onChange={onStyleChange} />
+      <FilterSelect label="Categories" value={category} options={categories} onChange={onCategoryChange} />
+      <FilterSelect label="Colors" value={color} options={colors} onChange={onColorChange} />
+      <FilterSelect label="Styles" value={style} options={styles} onChange={onStyleChange} />
       <Button
         variant="contained"
         startIcon={<FilterAltOffIcon />}
