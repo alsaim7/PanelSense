@@ -3,7 +3,6 @@ import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 
 const defaults = {
   categories: [
-    'All',
     'Slat Panels',
     'Flat Panels',
     'Wooden Panels',
@@ -14,7 +13,6 @@ const defaults = {
   ],
 
   colors: [
-    'All',
     'White',
     'Pearl White',
     'White Grey',
@@ -42,7 +40,6 @@ const defaults = {
   ],
 
   styles: [
-    'All',
     'Modern',
     'Luxury',
     'Minimal',
