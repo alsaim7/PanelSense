@@ -1,4 +1,4 @@
-import { Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Button, FormControl, MenuItem, Select } from '@mui/material';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 
 const defaults = {

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CircularProgress, ThemeProvider, createTheme } from '@mui/material';
@@ -44,6 +44,16 @@ function PageLoader() {
   );
 }
 
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname, search]);
+
+  return null;
+}
+
 function AnimatedRoutes() {
   const location = useLocation();
 
@@ -76,6 +86,7 @@ function App() {
     <HelmetProvider>
       <ThemeProvider theme={theme}>
         <BrowserRouter>
+          <ScrollToTop />
           <AnimatedRoutes />
           <ChatBotProvider />
         </BrowserRouter>
